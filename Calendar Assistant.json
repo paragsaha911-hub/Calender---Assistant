@@ -1,0 +1,169 @@
+{
+  "name": "Calendar Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -144,
+        -32
+      ],
+      "id": "d729f405-83bb-4781-ba60-fed2e01c7dbd",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Agent instructions: Look at my events/meetings for the day and send me an email to parag.saha911@gmail.com on the top two most important events of the day and tell me why. Look at the event title, description, attendees to find this out.\nFor formatted email: Look at my events/meetings for the day and send me a nicely formatted HTML email to aravindbharathykk@gmail.com on the top two most important events of the day and tell me why. Look at the event title, description, attendees to find this out.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        80,
+        -32
+      ],
+      "id": "e88a633d-5582-4374-b3ad-39b76205bb89",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        176
+      ],
+      "id": "3abd23b5-ce84-4355-b2a8-db90e8150fec",
+      "name": "Send a message in Gmail",
+      "webhookId": "fc717946-975d-4734-90bd-447a14f97cb4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "0fzGkKNMY6zzDGhJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "parag.saha911@gmail.com",
+          "mode": "list",
+          "cachedResultName": "parag.saha911@gmail.com"
+        },
+        "timeMax": "={{ $now.plus({ day: 1 }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        176
+      ],
+      "id": "cc0ae6ee-bb46-4dfe-b6eb-20a4799e06f0",
+      "name": "Get many events in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tY24pe78Pou1YrJw",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "fc62ec02-6a46-4398-b56c-266510868352",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "HtAtigAAPYmCSQ4Y",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0df11b65-41ee-4050-ace1-8cdd6228ff45",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b648f10197e36f7b0075d9323d477d6c7f8c077b0ea31efe7907ca4fc498ea19"
+  },
+  "nodeGroups": [],
+  "id": "w9u6LomTZqHagIJQ",
+  "tags": []
+}
